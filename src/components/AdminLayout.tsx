@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { Coffee, LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Menu, X, Warehouse, Ticket } from "lucide-react";
+import { Coffee, LayoutDashboard, Package, ShoppingCart, Settings, LogOut, Menu, X, Warehouse, Ticket, IceCream, } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const AdminLayout = () => {
@@ -15,6 +15,7 @@ export const AdminLayout = () => {
   const navItems = [
     { title: "Dashboard", icon: LayoutDashboard, path: "/admin" },
     { title: "Sản phẩm", icon: Package, path: "/admin/products" },
+    { title: "Topping", icon: IceCream, path: "/admin/toppings" },
     { title: "Kho nguyên liệu", icon: Warehouse, path: "/admin/inventory" },
     { title: "Đơn hàng", icon: ShoppingCart, path: "/admin/orders" },
     { title: "Voucher", icon: Ticket, path: "/admin/vouchers" },
