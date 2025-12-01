@@ -13,6 +13,9 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { apiCall } from "@/lib/api";
+import { mapAdminStatus } from "@/lib/mapAdminStatus";
+
+type AdminUiStatus = "pending" | "processing" | "shipping" | "completed" | "cancelled";
 
 interface Order {
   id: string;
@@ -20,9 +23,13 @@ interface Order {
   phone: string;
   products: string;
   total: number;
-  status: "pending" | "processing" | "shipping" | "completed" | "cancelled";
+  // rawStatus: đọc từ BE (pending, waiting, preparing, done, completed, cancelled, confirmed...)
+  rawStatus: string;
+  // status: status đã map cho UI Admin
+  status: AdminUiStatus;
   date: string;
 }
+
 
 const statusConfig = {
   pending: { label: "Chờ xử lý", color: "bg-accent/10 text-accent", icon: Clock },
@@ -57,20 +64,27 @@ export default function Orders() {
 
       const mapped: Order[] = res.data.map((o: any) => {
         console.log(`🔍 Dòng đơn hàng: ${o.Id} →`, o.ProductList || o.productList || o.productlist);
+
+        const rawStatus = ((o.Status || o.status || "pending") as string).toLowerCase();
+        const uiStatus = mapAdminStatus(rawStatus);
+
         return {
           id: o.Id || o.id,
           customer: o.CustomerName || o.user?.name || "Ẩn danh",
           phone: o.Phone || o.user?.phone || "",
-          products: o.ProductList && typeof o.ProductList === "string" && o.ProductList.trim()
-            ? o.ProductList
-            : "(không có dữ liệu)",
+          products:
+            o.ProductList && typeof o.ProductList === "string" && o.ProductList.trim()
+              ? o.ProductList
+              : "(không có dữ liệu)",
           total: o.Total || o.total || 0,
-          status: ((o.Status || o.status || "pending") as string).toLowerCase() as Order["status"],
+          rawStatus,      // lưu status gốc để sau này muốn dùng cũng có
+          status: uiStatus,
           date: o.CreatedAt
             ? new Date(o.CreatedAt).toLocaleString("vi-VN")
             : new Date().toLocaleString("vi-VN"),
         };
       });
+
 
       setOrders(mapped);
       console.log("📦 setOrders gọi xong, orders mới:", mapped);
